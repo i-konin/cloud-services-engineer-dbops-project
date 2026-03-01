@@ -1,3 +1,4 @@
+-- заполнение каталога продуктов
 INSERT INTO product (id, name, picture_url, price) VALUES 
 (1, 'Сливочная', 'https://res.cloudinary.com/sugrobov/image/upload/v1623323635/repos/sausages/6.jpg', 320.00),
 (2, 'Особая', 'https://res.cloudinary.com/sugrobov/image/upload/v1623323635/repos/sausages/5.jpg', 179.00),
@@ -7,12 +8,14 @@ INSERT INTO product (id, name, picture_url, price) VALUES
 (6, 'Русская', 'https://res.cloudinary.com/sugrobov/image/upload/v1623323635/repos/sausages/1.jpg', 189.00)
 ON CONFLICT (id) DO UPDATE SET price = EXCLUDED.price;
 
+-- генерация заказов
 INSERT INTO orders (id, status, date_created) 
 SELECT i, 
        (array['pending', 'shipped', 'cancelled'])[floor(random() * 3 + 1)],
        DATE(NOW() - (random() * (NOW() + '90 days' - NOW())))
 FROM generate_series(1, 10000000) s(i);
 
+-- генерация позиций для каждого заказа
 INSERT INTO order_product (quantity, order_id, product_id) 
 SELECT floor(1 + random() * 50)::int, 
        i, 
